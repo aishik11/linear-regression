@@ -30,40 +30,9 @@ except ImportError:
   pass
 
 
-URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/autos/imports-85.data"
 
 # Order is important for the csv-readers, so we use an OrderedDict here.
 
-
-
-defaults1 = collections.OrderedDict([
-    ("symboling", [0]),
-    ("normalized-losses", [0.0]),
-    ("make", [""]),
-    ("fuel-type", [""]),
-    ("aspiration", [""]),
-    ("num-of-doors", [""]),
-    ("body-style", [""]),
-    ("drive-wheels", [""]),
-    ("engine-location", [""]),
-    ("wheel-base", [0.0]),
-    ("length", [0.0]),
-    ("width", [0.0]),
-    ("height", [0.0]),
-    ("curb-weight", [0.0]),
-    ("engine-type", [""]),
-    ("num-of-cylinders", [""]),
-    ("engine-size", [0.0]),
-    ("fuel-system", [""]),
-    ("bore", [0.0]),
-    ("stroke", [0.0]),
-    ("compression-ratio", [0.0]),
-    ("horsepower", [0.0]),
-    ("peak-rpm", [0.0]),
-    ("city-mpg", [0.0]),
-    ("highway-mpg", [0.0]),
-    ("price", [0.0])
-])  # pyformat: disable
 
 
 defaults = collections.OrderedDict([
