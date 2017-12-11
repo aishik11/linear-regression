@@ -77,6 +77,19 @@ def main(argv):
 
   country_code_column = tf.feature_column.categorical_column_with_hash_bucket(
       key="country_code", hash_bucket_size=50)
+  
+  currency_column = tf.feature_column.categorical_column_with_hash_bucket(
+      key="currency", hash_bucket_size=50)
+  indicator_code_column = tf.feature_column.categorical_column_with_hash_bucket(
+      key="indicator_code", hash_bucket_size=50)
+  type_column = tf.feature_column.categorical_column_with_hash_bucket(
+      key="type", hash_bucket_size=50)
+  hedge_value_column = tf.feature_column.categorical_column_with_hash_bucket(
+      key="hedge_value", hash_bucket_size=50)
+  status_column = tf.feature_column.categorical_column_with_hash_bucket(
+      key="status", hash_bucket_size=50)
+  
+  
 
 
   feature_columns = [
@@ -84,6 +97,10 @@ def main(argv):
       tf.feature_column.numeric_column(key="libor_rate"),
       tf.feature_column.numeric_column(key="euribor_rate"),
       tf.feature_column.numeric_column(key="sold"),
+      tf.feature_column.numeric_column(key="bought"),
+      tf.feature_column.numeric_column(key="start_date"),
+      tf.feature_column.numeric_column(key="creation_date"),
+      tf.feature_column.numeric_column(key="sell_date"),
       #tf.feature_column.numeric_column(key="curb-weight"),
       #tf.feature_column.numeric_column(key="highway-mpg"),
       # This model adds two categorical colums that will adjust the price based
