@@ -108,7 +108,7 @@ def main(argv):
      # body_style_column,
       pf_category_column,
       office_id_column,
-      country_code_column,
+      country_code_column,currency_column,indicator_code_column,type_column,hedge_value_column,status_column,
 
 
   ]
