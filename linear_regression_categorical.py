@@ -19,24 +19,33 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
+import numpy as np
+import csv
+import os
 
 import imports87  # pylint: disable=g-bad-import-order
+import pred_data as pr
 
-STEPS = 1000
-PRICE_NORM_FACTOR = 1000
+STEPS = 200
+#should be 5000 or more
+PRICE_NORM_FACTOR= 1000
+#this is not used
 
 
 def main(argv):
   """Builds, trains, and evaluates the model."""
   assert len(argv) == 1
   (train, test) = imports87.dataset()
+  testpr=pr.dataset()
 
   # Switch the labels to units of thousands for better convergence.
   def normalize_price(features, labels):
-    return features, labels / PRICE_NORM_FACTOR
+    return features, labels #/ PRICE_NORM_FACTOR
 
   train = train.map(normalize_price)
+  print(train)
   test = test.map(normalize_price)
+  #testpr=testpr.map(normalize_price)
 
   # Build the training input_fn.
   def input_train():
@@ -51,6 +60,22 @@ def main(argv):
   def input_test():
     return (test.shuffle(1000).batch(128)
             .make_one_shot_iterator().get_next())
+
+  def input_testpr():
+    return(testpr.batch(128).make_one_shot_iterator().get_next())
+
+  def max_fech(tffech):
+    temp=0
+    for h in tffech.values():
+      if float(h)>temp:
+       temp=float(h)
+    
+    return temp
+  print("max is")
+  #print(train["sold"])
+  print("\n")
+  #need to fix this^^^^
+  
 
   # The following code demonstrates two of the ways that `feature_columns` can
   # be used to build a model with categorical inputs.
@@ -77,7 +102,6 @@ def main(argv):
 
   country_code_column = tf.feature_column.categorical_column_with_hash_bucket(
       key="country_code", hash_bucket_size=50)
-  
   currency_column = tf.feature_column.categorical_column_with_hash_bucket(
       key="currency", hash_bucket_size=50)
   indicator_code_column = tf.feature_column.categorical_column_with_hash_bucket(
@@ -88,8 +112,6 @@ def main(argv):
       key="hedge_value", hash_bucket_size=50)
   status_column = tf.feature_column.categorical_column_with_hash_bucket(
       key="status", hash_bucket_size=50)
-  
-  
 
 
   feature_columns = [
@@ -103,6 +125,8 @@ def main(argv):
       tf.feature_column.numeric_column(key="sell_date"),
       #tf.feature_column.numeric_column(key="curb-weight"),
       #tf.feature_column.numeric_column(key="highway-mpg"),
+      #tf.feature_column.numeric_column(key="curb-weight"),
+      #tf.feature_column.numeric_column(key="highway-mpg"),
       # This model adds two categorical colums that will adjust the price based
       # on "make" and "body-style".
      # body_style_column,
@@ -113,31 +137,91 @@ def main(argv):
 
   ]
 
+  
+
+
+  
+
   # Build the Estimator.
   model = tf.estimator.LinearRegressor(feature_columns=feature_columns)
+
 
   # Train the model.
   # By default, the Estimators log output every 100 steps.
   model.train(input_fn=input_train, steps=STEPS)
 
   # Evaluate how the model performs on data it has not yet seen.
-  eval_result = model.evaluate(input_fn=input_test)
+  #eval_result = model.evaluate(input_fn=input_test)
 
   # The evaluation returns a Python dictionary. The "average_loss" key holds the
+
+ # eval_2=model.evaluate(input_fn=input_test)["accuracy"]
+ #print('\nAccuracy: {0:f}'.format(accuracy_score))
   # Mean Squared Error (MSE).
-  for key in sorted(eval_result):
-    print('%s: %s'%(key,eval_result[key]))
+
+  #for key in sorted(eval_result):
+    #print('%s: %s'%(key,eval_result[key]))
     
 
     
-  average_loss = eval_result["average_loss"]
+  #average_loss = eval_result["average_loss"]
+
+  predicted=model.predict(input_fn=input_testpr)
+
+  
+  
+  #predicted=predicted/PRICE_NORM_FACTOR
+  #print(list(predicted))
+ # tf.Print(predicted,[predicted])
+ 
+  x=0
+  arr1=[]
+  
+ # for numbers in predicted:
+  #  #for key in numbers:
+   #   numbers1[x] = int(numbers)#/PRICE_NORM_FACTOR
+    #  x=x+1
+     # print(numbers1[key])
+  with open("test.csv") as f:
+    reader=csv.DictReader(f)
+    for row in reader:
+      #print(row["portfolio_id"])
+      arr1.append(str(row["portfolio_id"]))
+  
+  arr=[]
+  arr.append("portfolio_id")
+  arr.append("return")
+  arr2=[]
+  arr2.append(["portfolio_id","return"])
+  for i, p in enumerate(predicted):
+    for ki in p.values():
+     #print(i, float(ki))
+     #arr.append(str())
+     arr.append(arr1[x])
+     arr.append(float(ki))
+     arr2.append([arr1[x],abs(float(ki))])
+     #print(arr2)
+     x=x+1
+     
+  
+  h=0
+  with open('out.csv', 'w',newline='\n') as myfile:
+   #w = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+    w = csv.writer(myfile,delimiter =',',quotechar =' ')
+    #w.writerow(arr)
+    for j in arr2:
+      w.writerow(j)
+      
+    
+
+
 
   # Convert MSE to Root Mean Square Error (RMSE).
   print("\n" + 80 * "*")
-  print("\nRMS error for the test set: ${:.0f}"
-        .format(PRICE_NORM_FACTOR * average_loss**0.5))
+  #print("\nRMS error for the test set: ${:.0f}"
+   #     .format(PRICE_NORM_FACTOR * average_loss**0.5))
 
-  print()
+ # print()
 
 
 if __name__ == "__main__":
